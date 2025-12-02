@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Loader</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      transition: .2s;
+      margin-bottom: 15px;
+    }
+
+    input:focus {
+      border-color: #ff0000;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: .2s;
+      position: relative;
+    }
+
+    button.loading {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* زرار سبينر */
+    button.loading::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border: 3px solid #fff;
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      position: absolute;
+      right: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .video-box {
+      margin-top: 25px;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 320px;
+      border-radius: 12px;
+      border: none;
+      display: none;
+    }
+
+    /* لودينج الفريم */
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #ddd;
+      border-top: 6px solid #ff0000;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 40px auto;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      iframe {
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>🎬 قم بلصق رابط فيديو من يوتيوب</h2>
+
+    <input id="youtubeLink" placeholder="مثال: https://youtu.be/xxxxxx">
+    <br />
+    <button id="loadBtn" onclick="loadVideo()">عرض الفيديو</button>
+
+    <div class="video-box">
+      <div id="loader" class="loader"></div>
+      <iframe id="player" src=""></iframe>
+    </div>
+  </div>
+
+  <script>
+    function loadVideo() {
+      const input = document.getElementById("youtubeLink").value;
+      const videoId = extractVideoId(input);
+      const button = document.getElementById("loadBtn");
+      const loader = document.getElementById("loader");
+      const frame = document.getElementById("player");
+
+      if (!videoId) {
+        alert("⚠️ من فضلك أدخل رابط يوتيوب صحيح!");
+        return;
+      }
+
+      // زرار لودينج
+      button.classList.add("loading");
+
+      // اظهار لودينج الفريم
+      loader.style.display = "block";
+      frame.style.display = "none";
+
+      // تحميل الفيديو
+      frame.src = "https://www.youtube.com/embed/" + videoId;
+
+      // اختفاء اللودينج لما الفيديو يتحمّل
+      frame.onload = () => {
+        loader.style.display = "none";
+        frame.style.display = "block";
+        button.classList.remove("loading");
+      };
+    }
+
+    function extractVideoId(url) {
+      const regex = /(?:youtube\.com\/.*v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+  </script>
+
+</body>
+</html>
